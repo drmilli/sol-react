@@ -1,0 +1,581 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Roboto', sans-serif;
+    background: linear-gradient(135deg, #0a0a0a 0%, #1a1a2e 25%, #16213e 50%, #0f3460 75%, #1a1a2e 100%);
+    background-attachment: fixed;
+    color: #ffffff;
+    line-height: 1.6;
+    overflow-x: hidden;
+    min-height: 100vh;
+    position: relative;
+    width: 100%;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* Blockchain pattern overlay */
+body::before {
+    content: '';
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-image:
+        radial-gradient(circle at 25% 25%, rgba(0, 255, 255, 0.1) 0%, transparent 50%),
+        radial-gradient(circle at 75% 75%, rgba(255, 0, 255, 0.1) 0%, transparent 50%),
+        linear-gradient(45deg, transparent 40%, rgba(255, 255, 255, 0.02) 50%, transparent 60%);
+    background-size: 200px 200px, 300px 300px, 100px 100px;
+    animation: blockchain-float 20s ease-in-out infinite;
+    z-index: -1;
+}
+
+@keyframes blockchain-float {
+    0%, 100% { transform: translateY(0px) rotate(0deg); }
+    33% { transform: translateY(-10px) rotate(1deg); }
+    66% { transform: translateY(10px) rotate(-1deg); }
+}
+
+/* Floating particles */
+.particle {
+    position: absolute;
+    background: rgba(0, 255, 255, 0.3);
+    border-radius: 50%;
+    pointer-events: none;
+    animation: float-particle 15s linear infinite;
+}
+
+.particle:nth-child(2n) {
+    background: rgba(255, 0, 255, 0.3);
+    animation-duration: 20s;
+}
+
+.particle:nth-child(3n) {
+    background: rgba(255, 255, 0, 0.3);
+    animation-duration: 25s;
+}
+
+@keyframes float-particle {
+    0% {
+        transform: translateY(100vh) rotate(0deg);
+        opacity: 0;
+    }
+    10% { opacity: 1; }
+    90% { opacity: 1; }
+    100% {
+        transform: translateY(-100px) rotate(360deg);
+        opacity: 0;
+    }
+}
+
+.container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 20px;
+    position: relative;
+    z-index: 1;
+}
+
+.header {
+    text-align: center;
+    margin-bottom: 50px;
+    padding: 40px 0;
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 20px;
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+}
+
+.logo-section {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 20px;
+    margin-bottom: 15px;
+}
+
+.solana-logo {
+    height: 60px;
+    width: 60px;
+    filter: drop-shadow(0 0 15px rgba(0, 255, 255, 0.6));
+    border-radius: 20px;
+}
+
+.main-title {
+    font-size: 48px;
+    font-weight: 700;
+    color: #ffffff;
+    text-shadow: 0 0 30px rgba(0, 255, 255, 0.5);
+    margin: 0;
+}
+
+.subtitle {
+    font-size: 18px;
+    color: #00ffff;
+    text-shadow: 0 0 15px rgba(0, 255, 255, 0.5);
+    margin: 0;
+}
+
+.wallet-section {
+    margin-bottom: 50px;
+}
+
+.wallet-card {
+    background: rgba(255, 255, 255, 0.05);
+    padding: 40px 30px;
+    border-radius: 20px;
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+    text-align: center;
+}
+
+.wallet-card h2 {
+    font-size: 28px;
+    margin-bottom: 15px;
+    color: #ffffff;
+    text-shadow: 0 0 20px rgba(0, 255, 255, 0.5);
+}
+
+.wallet-card p {
+    font-size: 16px;
+    color: #e0e0e0;
+    margin-bottom: 30px;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
+}
+
+.connect-btn {
+    background: linear-gradient(135deg, #00ffff 0%, #0080ff 100%);
+    color: #ffffff;
+    border: none;
+    padding: 15px 30px;
+    font-size: 18px;
+    font-weight: 700;
+    border-radius: 12px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 15px rgba(0, 255, 255, 0.3);
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.connect-btn:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 8px 25px rgba(0, 255, 255, 0.5);
+}
+
+.btn-icon {
+    font-size: 20px;
+}
+
+.wallet-info {
+    margin-top: 30px;
+    padding: 20px;
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 12px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.wallet-address, .wallet-balance {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 10px;
+    font-size: 16px;
+}
+
+.wallet-address:last-child {
+    margin-bottom: 0;
+}
+
+.label {
+    color: #00ffff;
+    font-weight: 700;
+}
+
+.features-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 30px;
+    margin-bottom: 50px;
+}
+
+.feature-card {
+    background: rgba(255, 255, 255, 0.05);
+    padding: 30px 25px;
+    border-radius: 20px;
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+    text-align: center;
+    transition: all 0.3s ease;
+}
+
+.feature-card:hover {
+    transform: translateY(-5px);
+    border-color: rgba(0, 255, 255, 0.3);
+    box-shadow: 0 12px 40px rgba(0, 255, 255, 0.2);
+}
+
+.feature-icon {
+    font-size: 48px;
+    margin-bottom: 20px;
+}
+
+.feature-card h3 {
+    font-size: 24px;
+    margin-bottom: 15px;
+    color: #ffffff;
+    text-shadow: 0 0 15px rgba(0, 255, 255, 0.5);
+}
+
+.feature-card p {
+    color: #e0e0e0;
+    margin-bottom: 25px;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
+}
+
+.feature-btn {
+    background: rgba(255, 255, 255, 0.1);
+    color: #00ffff;
+    border: 2px solid rgba(0, 255, 255, 0.3);
+    padding: 12px 24px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: 700;
+    transition: all 0.3s ease;
+}
+
+.feature-btn:hover {
+    background: rgba(0, 255, 255, 0.2);
+    border-color: #00ffff;
+    transform: translateY(-2px);
+}
+
+.stats-section {
+    margin-bottom: 50px;
+}
+
+.stats-section h2 {
+    font-size: 32px;
+    text-align: center;
+    margin-bottom: 40px;
+    color: #ffffff;
+    text-shadow: 0 0 20px rgba(0, 255, 255, 0.5);
+}
+
+.stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 30px;
+}
+
+.stat-item {
+    background: rgba(255, 255, 255, 0.05);
+    padding: 30px 25px;
+    border-radius: 20px;
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+    text-align: center;
+}
+
+.stat-value {
+    font-size: 32px;
+    font-weight: 700;
+    color: #00ffff;
+    margin-bottom: 8px;
+    text-shadow: 0 0 15px rgba(0, 255, 255, 0.5);
+}
+
+.stat-label {
+    font-size: 16px;
+    color: #e0e0e0;
+    margin-bottom: 8px;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
+}
+
+.stat-change {
+    font-size: 14px;
+    font-weight: 700;
+}
+
+.stat-change.positive {
+    color: #00ff00;
+}
+
+.stat-change.negative {
+    color: #ff4444;
+}
+
+.stat-change.neutral {
+    color: #ffff00;
+}
+
+.recent-activity, .playground-tips {
+    margin-bottom: 50px;
+}
+
+.recent-activity h2, .playground-tips h2 {
+    font-size: 28px;
+    text-align: center;
+    margin-bottom: 30px;
+    color: #ffffff;
+    text-shadow: 0 0 20px rgba(0, 255, 255, 0.5);
+}
+
+.activity-list {
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 20px;
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+    overflow: hidden;
+    max-height: 500px;
+    overflow-y: auto;
+}
+
+.activity-item {
+    display: flex;
+    align-items: center;
+    padding: 20px 25px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+}
+
+.activity-item::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 0;
+    height: 100%;
+    width: 4px;
+    background: linear-gradient(135deg, #00ffff, #0080ff);
+    transform: scaleY(0);
+    transition: transform 0.3s ease;
+}
+
+.activity-item:hover {
+    background: rgba(255, 255, 255, 0.08);
+    transform: translateX(5px);
+}
+
+.activity-item:hover::before {
+    transform: scaleY(1);
+}
+
+.activity-item.new-activity {
+    animation: slideInFromRight 0.5s ease-out;
+    background: rgba(0, 255, 255, 0.1);
+}
+
+.activity-item:last-child {
+    border-bottom: none;
+}
+
+@keyframes slideInFromRight {
+    0% {
+        transform: translateX(100%);
+        opacity: 0;
+    }
+    100% {
+        transform: translateX(0);
+        opacity: 1;
+    }
+}
+
+.activity-icon {
+    font-size: 28px;
+    margin-right: 20px;
+    min-width: 28px;
+    text-align: center;
+    filter: drop-shadow(0 0 8px rgba(0, 255, 255, 0.3));
+}
+
+.activity-details {
+    flex: 1;
+    min-width: 0;
+}
+
+.activity-hash {
+    font-weight: 700;
+    color: #00ffff;
+    margin-bottom: 4px;
+    font-family: 'Courier New', monospace;
+    text-shadow: 0 0 10px rgba(0, 255, 255, 0.5);
+}
+
+.activity-type {
+    font-size: 14px;
+    color: #cccccc;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    font-weight: 600;
+}
+
+.activity-amount {
+    font-weight: 700;
+    margin-right: 20px;
+    font-size: 16px;
+    text-shadow: 0 0 5px currentColor;
+}
+
+.activity-amount.positive {
+    color: #00ff00;
+}
+
+.activity-amount.negative {
+    color: #ff4444;
+}
+
+.activity-time {
+    color: #999;
+    font-size: 12px;
+    font-weight: 500;
+    white-space: nowrap;
+}
+
+.tips-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 30px;
+}
+
+.tip-item {
+    background: rgba(255, 255, 255, 0.05);
+    padding: 30px 25px;
+    border-radius: 20px;
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+    text-align: center;
+}
+
+.tip-icon {
+    font-size: 36px;
+    margin-bottom: 20px;
+}
+
+.tip-item h4 {
+    font-size: 20px;
+    margin-bottom: 15px;
+    color: #ffffff;
+    text-shadow: 0 0 15px rgba(0, 255, 255, 0.5);
+}
+
+.tip-item p {
+    color: #e0e0e0;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
+}
+
+@media (max-width: 768px) {
+    .main-title {
+        font-size: 36px;
+    }
+
+    .logo-section {
+        flex-direction: column;
+        gap: 15px;
+    }
+
+    .features-grid, .stats-grid, .tips-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .container {
+        padding: 15px;
+    }
+}
+
+/* Scrollbar styling */
+::-webkit-scrollbar {
+    width: 8px;
+}
+
+::-webkit-scrollbar-track {
+    background: rgba(255, 255, 255, 0.1);
+}
+
+::-webkit-scrollbar-thumb {
+    background: rgba(0, 255, 255, 0.5);
+    border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: rgba(0, 255, 255, 0.7);
+}
+
+/* Override Vite default root styling to allow full centering */
+#root {
+    max-width: none;
+    margin: 0;
+    padding: 0;
+    text-align: left;
+}
+
+/* Notification styles */
+.notification {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    background: rgba(255, 255, 255, 0.95);
+    color: #000;
+    padding: 15px 20px;
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+    z-index: 1000;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    min-width: 300px;
+    animation: slideIn 0.3s ease-out;
+    backdrop-filter: blur(10px);
+}
+
+.notification.info {
+    border-left: 4px solid #00ffff;
+}
+
+.notification.success {
+    border-left: 4px solid #00ff00;
+}
+
+.notification.error {
+    border-left: 4px solid #ff4444;
+}
+
+.notification-close {
+    background: none;
+    border: none;
+    font-size: 20px;
+    cursor: pointer;
+    color: #666;
+    margin-left: 10px;
+    transition: color 0.2s;
+}
+
+.notification-close:hover {
+    color: #000;
+}
+
+@keyframes slideIn {
+    from {
+        transform: translateX(100%);
+        opacity: 0;
+    }
+    to {
+        transform: translateX(0);
+        opacity: 1;
+    }
+}
