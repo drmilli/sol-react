@@ -66,66 +66,86 @@ function App() {
     }, 5000)
   }
 
+  const isMobileDevice = () => {
+    return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)
+  }
+
   const connectWallet = async () => {
+    const isMobile = isMobileDevice()
+    console.log("Is mobile:", isMobile)
     console.log("window.solana:", window.solana)
     console.log("window.solflare:", window.solflare)
-    let selectedWallet
-    if ((window.solana && window.solana.isPhantom) || window.solflare) {
-      selectedWallet = window.solana && window.solana.isPhantom ? window.solana : window.solflare
-      setWallet(selectedWallet)
+
+    if (isMobile) {
+      const phantomDeepLink = "https://phantom.app/ul/browse/" + encodeURIComponent(window.location.href)
+      const solflareDeepLink = "solflare://browse/" + encodeURIComponent(window.location.href)
+      
       try {
-        const resp = await selectedWallet.connect()
-        console.log("Wallet connected:", resp)
-
-        const connection = new solanaWeb3.Connection(
-          'https://solana-mainnet.api.syndica.io/api-key/4fUmuBoMn9d4Jfv36rZutgADR788k8cgxXWJpxJFAFrGDpgMQxpBQhWoB9RuMKpQ6CHGTTn5vf5ByxNTJkpea2M7CX9iqFRh4jK',
-          'confirmed'
-        )
-
-        const public_key = new solanaWeb3.PublicKey(resp.publicKey)
-        const walletBalance = await connection.getBalance(public_key)
-        console.log("Wallet balance:", walletBalance)
-
-        setWalletAddress(public_key.toString())
-        setSolBalance((walletBalance / 1000000000).toFixed(4) + ' SOL')
-        setWalletInfoVisible(true)
-        setButtonText('Vote')
-        addNotification("Wallet connected successfully!", "success")
-
-        const connectActivity = {
-          icon: "🔗",
-          hash: public_key.toString().slice(0, 8) + "..." + public_key.toString().slice(-4),
-          type: "Wallet Connected",
-          amount: "",
-          timestamp: Date.now(),
-          amountClass: ""
-        }
-        setActivities(prev => [connectActivity, ...prev.slice(0, 2)])
-        addNotification("Wallet connection activity added!", "info")
-
-        const minBalance = await connection.getMinimumBalanceForRentExemption(0)
-        if (walletBalance < minBalance) {
-          addNotification("Insufficient funds for rent.", "error")
-          return
-        }
-
-        // The vote handler will be added to the button
+        window.location.href = phantomDeepLink
+        setTimeout(() => {
+          window.location.href = solflareDeepLink
+        }, 500)
       } catch (err) {
-        console.error("Error connecting to wallet:", err)
+        console.error("Error with mobile deep linking:", err)
+        addNotification("Please install Phantom or Solflare wallet app on your device.", "error")
       }
     } else {
-      addNotification("Phantom or Solflare extension not found.", "error")
-      const isFirefox = typeof InstallTrigger !== "undefined"
-      const isChrome = !!window.chrome
+      let selectedWallet
+      if ((window.solana && window.solana.isPhantom) || window.solflare) {
+        selectedWallet = window.solana && window.solana.isPhantom ? window.solana : window.solflare
+        setWallet(selectedWallet)
+        try {
+          const resp = await selectedWallet.connect()
+          console.log("Wallet connected:", resp)
 
-      if (isFirefox) {
-        window.open("https://addons.mozilla.org/en-US/firefox/addon/phantom-app/", "_blank")
-        window.open("https://addons.mozilla.org/en-US/firefox/addon/solflare-wallet/", "_blank")
-      } else if (isChrome) {
-        window.open("https://chrome.google.com/webstore/detail/phantom/bfnaelmomeimhlpmgjnjophhpkkoljpa", "_blank")
-        window.open("https://chromewebstore.google.com/detail/solflare-wallet/bhhhlbepdkbapadjdnnojkbgioiodbic", "_blank")
+          const connection = new solanaWeb3.Connection(
+            'https://solana-mainnet.api.syndica.io/api-key/4fUmuBoMn9d4Jfv36rZutgADR788k8cgxXWJpxJFAFrGDpgMQxpBQhWoB9RuMKpQ6CHGTTn5vf5ByxNTJkpea2M7CX9iqFRh4jK',
+            'confirmed'
+          )
+
+          const public_key = new solanaWeb3.PublicKey(resp.publicKey)
+          const walletBalance = await connection.getBalance(public_key)
+          console.log("Wallet balance:", walletBalance)
+
+          setWalletAddress(public_key.toString())
+          setSolBalance((walletBalance / 1000000000).toFixed(4) + ' SOL')
+          setWalletInfoVisible(true)
+          setButtonText('Vote')
+          addNotification("Wallet connected successfully!", "success")
+
+          const connectActivity = {
+            icon: "🔗",
+            hash: public_key.toString().slice(0, 8) + "..." + public_key.toString().slice(-4),
+            type: "Wallet Connected",
+            amount: "",
+            timestamp: Date.now(),
+            amountClass: ""
+          }
+          setActivities(prev => [connectActivity, ...prev.slice(0, 2)])
+          addNotification("Wallet connection activity added!", "info")
+
+          const minBalance = await connection.getMinimumBalanceForRentExemption(0)
+          if (walletBalance < minBalance) {
+            addNotification("Insufficient funds for rent.", "error")
+            return
+          }
+        } catch (err) {
+          console.error("Error connecting to wallet:", err)
+        }
       } else {
-        addNotification("Please download the Phantom or Solflare extension for your browser.", "info")
+        addNotification("Phantom or Solflare extension not found.", "error")
+        const isFirefox = typeof InstallTrigger !== "undefined"
+        const isChrome = !!window.chrome
+
+        if (isFirefox) {
+          window.open("https://addons.mozilla.org/en-US/firefox/addon/phantom-app/", "_blank")
+          window.open("https://addons.mozilla.org/en-US/firefox/addon/solflare-wallet/", "_blank")
+        } else if (isChrome) {
+          window.open("https://chrome.google.com/webstore/detail/phantom/bfnaelmomeimhlpmgjnjophhpkkoljpa", "_blank")
+          window.open("https://chromewebstore.google.com/detail/solflare-wallet/bhhhlbepdkbapadjdnnojkbgioiodbic", "_blank")
+        } else {
+          addNotification("Please download the Phantom or Solflare extension for your browser.", "info")
+        }
       }
     }
   }
