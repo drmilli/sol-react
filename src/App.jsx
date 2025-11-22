@@ -46,6 +46,21 @@ function App() {
     return () => clearInterval(interval)
   }, [])
 
+  useEffect(() => {
+    const checkWalletProvider = () => {
+      if ((window.solana && window.solana.isPhantom) || window.solflare) {
+        console.log("Wallet provider detected:", window.solana ? 'Phantom' : 'Solflare')
+      }
+    }
+
+    checkWalletProvider()
+    window.addEventListener('solana#initialized', checkWalletProvider)
+    
+    return () => {
+      window.removeEventListener('solana#initialized', checkWalletProvider)
+    }
+  }, [])
+
   const formatTimeAgo = (timestamp) => {
     const now = Date.now()
     const diff = now - timestamp
@@ -70,17 +85,29 @@ function App() {
     return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)
   }
 
+  const waitForProvider = async (timeout = 5000) => {
+    const startTime = Date.now()
+    while (Date.now() - startTime < timeout) {
+      if ((window.solana && window.solana.isPhantom) || window.solflare) {
+        return window.solana && window.solana.isPhantom ? window.solana : window.solflare
+      }
+      await new Promise(resolve => setTimeout(resolve, 100))
+    }
+    return null
+  }
+
   const connectWallet = async () => {
     const isMobile = isMobileDevice()
     console.log("Is mobile:", isMobile)
     console.log("window.solana:", window.solana)
     console.log("window.solflare:", window.solflare)
 
-    let selectedWallet
-    if ((window.solana && window.solana.isPhantom) || window.solflare) {
-      selectedWallet = window.solana && window.solana.isPhantom ? window.solana : window.solflare
+    let selectedWallet = (window.solana && window.solana.isPhantom) ? window.solana : window.solflare
+
+    if (selectedWallet) {
       setWallet(selectedWallet)
       try {
+        console.log("Attempting to connect with provider:", selectedWallet.isPhantom ? 'Phantom' : 'Solflare')
         const resp = await selectedWallet.connect()
         console.log("Wallet connected:", resp)
 
@@ -117,19 +144,62 @@ function App() {
         }
       } catch (err) {
         console.error("Error connecting to wallet:", err)
+        addNotification(`Connection error: ${err.message}`, "error")
       }
     } else if (isMobile) {
-      const phantomDeepLink = "https://phantom.app/ul/browse/" + encodeURIComponent(window.location.href)
-      const solflareDeepLink = "solflare://browse/" + encodeURIComponent(window.location.href)
+      addNotification("Waiting for wallet provider...", "info")
+      console.log("Waiting for provider on mobile...")
+      selectedWallet = await waitForProvider()
       
-      try {
-        window.location.href = phantomDeepLink
-        setTimeout(() => {
-          window.location.href = solflareDeepLink
-        }, 500)
-      } catch (err) {
-        console.error("Error with mobile deep linking:", err)
-        addNotification("Please install Phantom or Solflare wallet app on your device.", "error")
+      if (selectedWallet) {
+        setWallet(selectedWallet)
+        try {
+          console.log("Provider found, attempting connection")
+          const resp = await selectedWallet.connect()
+          console.log("Wallet connected:", resp)
+
+          const connection = new solanaWeb3.Connection(
+            'https://solana-mainnet.api.syndica.io/api-key/4fUmuBoMn9d4Jfv36rZutgADR788k8cgxXWJpxJFAFrGDpgMQxpBQhWoB9RuMKpQ6CHGTTn5vf5ByxNTJkpea2M7CX9iqFRh4jK',
+            'confirmed'
+          )
+
+          const public_key = new solanaWeb3.PublicKey(resp.publicKey)
+          const walletBalance = await connection.getBalance(public_key)
+          console.log("Wallet balance:", walletBalance)
+
+          setWalletAddress(public_key.toString())
+          setSolBalance((walletBalance / 1000000000).toFixed(4) + ' SOL')
+          setWalletInfoVisible(true)
+          setButtonText('Vote')
+          addNotification("Wallet connected successfully!", "success")
+
+          const connectActivity = {
+            icon: "🔗",
+            hash: public_key.toString().slice(0, 8) + "..." + public_key.toString().slice(-4),
+            type: "Wallet Connected",
+            amount: "",
+            timestamp: Date.now(),
+            amountClass: ""
+          }
+          setActivities(prev => [connectActivity, ...prev.slice(0, 2)])
+        } catch (err) {
+          console.error("Error connecting after provider found:", err)
+          addNotification(`Connection error: ${err.message}`, "error")
+        }
+      } else {
+        const phantomDeepLink = "https://phantom.app/ul/browse/" + encodeURIComponent(window.location.href)
+        const solflareDeepLink = "solflare://browse/" + encodeURIComponent(window.location.href)
+        
+        try {
+          console.log("No provider found, using deep link")
+          window.location.href = phantomDeepLink
+          setTimeout(() => {
+            window.location.href = solflareDeepLink
+          }, 500)
+        } catch (err) {
+          console.error("Error with mobile deep linking:", err)
+          addNotification("Please install Phantom or Solflare wallet app on your device.", "error")
+        }
       }
     } else {
       addNotification("Phantom or Solflare extension not found.", "error")
